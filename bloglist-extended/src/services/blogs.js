@@ -30,7 +30,7 @@ const modify = async (blogId, modifiedBlog) => {
   const response = await axios.put(
     `${baseUrl}/${blogId}`,
     modifiedBlog,
-    config
+    config,
   );
   return response.data;
 };

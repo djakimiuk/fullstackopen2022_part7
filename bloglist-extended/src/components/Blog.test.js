@@ -16,7 +16,7 @@ test("renders content", () => {
   render(<Blog blog={blog} user={{ username: "Dawid" }} />);
 
   const title = screen.queryByText(
-    /Component test with react-testing-library/i
+    /Component test with react-testing-library/i,
   );
   const author = screen.queryByText(/Dawid/i);
   const url = screen.queryByText("https://google.com");
@@ -60,7 +60,7 @@ test("clicking the like button twice calls event handler twice as well", async (
   const mockHandler = jest.fn();
 
   render(
-    <Blog blog={blog} user={{ username: "Dawid" }} modifyBlog={mockHandler} />
+    <Blog blog={blog} user={{ username: "Dawid" }} modifyBlog={mockHandler} />,
   );
 
   const user = userEvent.setup();
