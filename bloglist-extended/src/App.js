@@ -6,23 +6,22 @@ import BlogForm from "./components/BlogForm";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import { useNotify } from "./NotificationContext";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const notify = useNotify();
   const blogFormRef = useRef();
 
-  useEffect(() => {
-    const fetchAndSortBlogs = async () => {
-      const blogs = await blogService.getAll();
-      blogs.sort((blogA, blogB) => blogB.likes - blogA.likes);
-      setBlogs(blogs);
-    };
-    fetchAndSortBlogs();
-  }, []);
+  const result = useQuery({
+    queryKey: ["blogs"],
+    queryFn: blogService.getAll,
+    refetchOnWindowFocus: false,
+  });
+
+  const blogs = result.data;
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedInUser");
@@ -52,20 +51,6 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedInUser");
     setUser(null);
-  };
-
-  const addBlog = async (blogObject) => {
-    try {
-      blogFormRef.current.toggleVisibility();
-      const savedBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat({ ...savedBlog, user }));
-      notify({
-        body: `a new blog ${savedBlog.title} added`,
-        error: false,
-      });
-    } catch (error) {
-      notify({ body: error.message, error: true });
-    }
   };
 
   const modifyBlog = async (blogId, modifiedBlogObject) => {
@@ -124,7 +109,7 @@ const App = () => {
         </button>
       </p>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
+        <BlogForm />
       </Togglable>
       {blogs.map((blog) => (
         <Blog
@@ -137,6 +122,10 @@ const App = () => {
       ))}
     </div>
   );
+
+  if (result.isLoading) {
+    return <div>loading data...</div>;
+  }
 
   return (
     <>

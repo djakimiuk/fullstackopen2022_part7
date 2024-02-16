@@ -1,7 +1,26 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
+import blogs from "../services/blogs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {useNotify } from "../NotificationContext";
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = () => {
+  const queryClient = useQueryClient();
+  const notify = useNotify();
+  const newBlogMutation = useMutation({
+    mutationFn: blogs.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
+      notify({
+        body: `a new blog ${newBlog.title} added`,
+        error: false,
+      });
+    },
+    onError: (error) => {
+      notify({ body: error.message, error: true });
+    },
+  });
+
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -9,11 +28,13 @@ const BlogForm = ({ createBlog }) => {
   const addBlog = (event) => {
     event.preventDefault();
 
-    createBlog({
+    const blog = {
       author: author,
       title: title,
       url: url,
-    });
+    };
+
+    newBlogMutation.mutate(blog);
 
     setTitle("");
     setAuthor("");
@@ -60,10 +81,6 @@ const BlogForm = ({ createBlog }) => {
       </form>
     </div>
   );
-};
-
-BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
 };
 
 export default BlogForm;
