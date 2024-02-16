@@ -5,17 +5,14 @@ import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import { useNotify } from "./NotificationContext";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [notificationMsg, setNotificationMsg] = useState({
-    body: null,
-    error: false,
-  });
-
+  const notify = useNotify();
   const blogFormRef = useRef();
 
   useEffect(() => {
@@ -48,13 +45,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      setNotificationMsg({ body: "Wrong credentials", error: true });
-      setTimeout(() => {
-        setNotificationMsg({
-          body: null,
-          error: false,
-        });
-      }, 5000);
+      notify({ body: "Wrong credentials", error: true });
     }
   };
 
@@ -68,24 +59,12 @@ const App = () => {
       blogFormRef.current.toggleVisibility();
       const savedBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat({ ...savedBlog, user }));
-      setNotificationMsg({
+      notify({
         body: `a new blog ${savedBlog.title} added`,
         error: false,
       });
-      setTimeout(() => {
-        setNotificationMsg({
-          body: null,
-          error: false,
-        });
-      }, 5000);
     } catch (error) {
-      setNotificationMsg({ body: error.message, error: true });
-      setTimeout(() => {
-        setNotificationMsg({
-          body: null,
-          error: false,
-        });
-      }, 5000);
+      notify({ body: error.message, error: true });
     }
   };
 
@@ -93,13 +72,7 @@ const App = () => {
     try {
       await blogService.modify(blogId, modifiedBlogObject);
     } catch (error) {
-      setNotificationMsg({ body: error.message, error: true });
-      setTimeout(() => {
-        setNotificationMsg({
-          body: null,
-          error: false,
-        });
-      }, 5000);
+      notify({ body: error.message, error: true });
     }
   };
 
@@ -109,13 +82,7 @@ const App = () => {
       await blogService.deleteItem(blogId);
       setBlogs(blogsArrayCopy.filter((blog) => blog.id !== blogId));
     } catch (error) {
-      setNotificationMsg({ body: error.message, error: true });
-      setTimeout(() => {
-        setNotificationMsg({
-          body: null,
-          error: false,
-        });
-      }, 5000);
+      useNotify({ body: error.message, error: true });
     }
   };
 
@@ -173,7 +140,7 @@ const App = () => {
 
   return (
     <>
-      <Notification message={notificationMsg} />
+      <Notification />
       {user === null && loginForm()}
       {user !== null && blogsList(user)}
     </>
