@@ -6,7 +6,7 @@ import BlogForm from "./components/BlogForm";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import { useNotify } from "./NotificationContext";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -51,24 +51,6 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedInUser");
     setUser(null);
-  };
-
-  const modifyBlog = async (blogId, modifiedBlogObject) => {
-    try {
-      await blogService.modify(blogId, modifiedBlogObject);
-    } catch (error) {
-      notify({ body: error.message, error: true });
-    }
-  };
-
-  const deleteBlog = async (blogId) => {
-    try {
-      const blogsArrayCopy = [...blogs];
-      await blogService.deleteItem(blogId);
-      setBlogs(blogsArrayCopy.filter((blog) => blog.id !== blogId));
-    } catch (error) {
-      useNotify({ body: error.message, error: true });
-    }
   };
 
   const loginForm = () => (
@@ -116,8 +98,6 @@ const App = () => {
           key={blog.id}
           blog={blog}
           user={user}
-          modifyBlog={modifyBlog}
-          deleteBlog={deleteBlog}
         />
       ))}
     </div>

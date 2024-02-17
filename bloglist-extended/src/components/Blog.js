@@ -1,8 +1,14 @@
 import { useState } from "react";
-const Blog = ({ blog, modifyBlog, user, deleteBlog }) => {
+import blogs from "../services/blogs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNotify } from "../NotificationContext";
+
+const Blog = ({ blog, user }) => {
   const [visible, setVisible] = useState(false);
   const [likes, setLikes] = useState(blog.likes);
 
+  const queryClient = useQueryClient();
+  const notify = useNotify();
   const showWhenVisible = { display: visible ? "" : "none" };
   const showDeleteBtn = {
     display: blog.user.username === user.username ? "" : "none",
@@ -16,23 +22,57 @@ const Blog = ({ blog, modifyBlog, user, deleteBlog }) => {
     marginBottom: 5,
   };
 
+  const updateBlogMutation = useMutation({
+    mutationFn: blogs.modify,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id !== updatedBlog.id ? blog : updatedBlog,
+      );
+      queryClient.setQueryData(["blogs"], updatedBlogs);
+      notify({
+        body: `blog ${updatedBlog.title} voted`,
+        error: false,
+      });
+    },
+    onError: (error) => {
+      notify({ body: error.message, error: true });
+    },
+  });
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogs.deleteItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      notify({
+        body: `blog deleted`,
+        error: false,
+      });
+    },
+    onError: (error) => {
+      notify({ body: error.message, error: true });
+    },
+  });
+
   const visibilityHandler = () => {
     setVisible(!visible);
   };
 
-  const increaseLikes = () => {
+  const increaseLikes = async () => {
     const updatedLikes = likes + 1;
     setLikes(updatedLikes);
-    const modifiedBlog = { ...blog, likes: updatedLikes };
-    modifyBlog(blog.id, modifiedBlog);
+    const modifiedBlog = { ...blog, likes: updatedLikes};
+    updateBlogMutation.mutateAsync(modifiedBlog);
   };
 
   const deleteHandler = () => {
     if (window.confirm(`Remove blog ${blog.title} ${blog.author}`)) {
-      deleteBlog(blog.id);
+      deleteBlogMutation.mutate(blog);
     }
     return;
   };
+
+  console.log(blog);
 
   return (
     <div style={blogStyle} className="blog">

@@ -22,26 +22,33 @@ const create = async (newBlog) => {
   return response.data;
 };
 
-const modify = async (blogId, modifiedBlog) => {
+const modify = async (modifiedBlog) => {
   const config = {
     headers: { Authorization: token },
   };
 
   const response = await axios.put(
-    `${baseUrl}/${blogId}`,
+    `${baseUrl}/${modifiedBlog.id}`,
     modifiedBlog,
     config,
   );
   return response.data;
 };
 
-const deleteItem = async (blogId) => {
-  const config = {
-    headers: { Authorization: token },
-  };
+const deleteItem = async (blogToDelete) => {
+  try {
+    const config = {
+      headers: { Authorization: token },
+    };
 
-  const response = await axios.delete(`${baseUrl}/${blogId}`, config);
-  return response.data;
+    const response = await axios.delete(
+      `${baseUrl}/${blogToDelete.id}`,
+      config,
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to delete blog: ${error.message}`);
+  }
 };
 
 export default { getAll, setToken, create, modify, deleteItem };
