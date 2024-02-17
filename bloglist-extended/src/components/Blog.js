@@ -72,8 +72,6 @@ const Blog = ({ blog, user }) => {
     return;
   };
 
-  console.log(blog);
-
   return (
     <div style={blogStyle} className="blog">
       <span className="titleAndAuthor">

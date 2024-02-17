@@ -7,13 +7,15 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import { useNotify } from "./NotificationContext";
 import { useQuery } from "@tanstack/react-query";
+import { useUserDispatch, useUserValue } from "./UserContext";
 
 const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
   const notify = useNotify();
   const blogFormRef = useRef();
+  const userDispatch = useUserDispatch();
+  const user = useUserValue();
 
   const result = useQuery({
     queryKey: ["blogs"],
@@ -26,9 +28,9 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedInUser");
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      const parsedUser = JSON.parse(loggedUserJSON);
+      userDispatch({ type: "setUser", payload: parsedUser });
+      blogService.setToken(parsedUser.token);
     }
   }, []);
 
@@ -40,7 +42,7 @@ const App = () => {
       window.localStorage.setItem("loggedInUser", JSON.stringify(user));
 
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch({ type: "setUser", payload: user });
       setUsername("");
       setPassword("");
     } catch (exception) {
@@ -50,7 +52,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedInUser");
-    setUser(null);
+    userDispatch({ type: "clearUser" });
   };
 
   const loginForm = () => (
@@ -94,11 +96,7 @@ const App = () => {
         <BlogForm />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          user={user}
-        />
+        <Blog key={blog.id} blog={blog} user={user} />
       ))}
     </div>
   );
