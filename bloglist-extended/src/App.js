@@ -1,115 +1,54 @@
-import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
-import BlogForm from "./components/BlogForm";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
 import { useNotify } from "./NotificationContext";
-import { useQuery } from "@tanstack/react-query";
 import { useUserDispatch, useUserValue } from "./UserContext";
+import {
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useNavigate,
+  useMatch,
+} from "react-router-dom";
+import Blogs from "./components/Blogs";
+import Blog from "./components/Blog";
+import Login from "./components/Login";
+import NotFound from "./components/NotFound";
+import { useQuery } from "@tanstack/react-query";
+import blogService from "./services/blogs";
 
 const App = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const notify = useNotify();
-  const blogFormRef = useRef();
-  const userDispatch = useUserDispatch();
-  const user = useUserValue();
-
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
   const result = useQuery({
     queryKey: ["blogs"],
     queryFn: blogService.getAll,
     refetchOnWindowFocus: false,
   });
 
+  const match = useMatch("/blogs/:id");
+
   const blogs = result.data;
 
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedInUser");
-    if (loggedUserJSON) {
-      const parsedUser = JSON.parse(loggedUserJSON);
-      userDispatch({ type: "setUser", payload: parsedUser });
-      blogService.setToken(parsedUser.token);
-    }
-  }, []);
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.login({ username, password });
-
-      window.localStorage.setItem("loggedInUser", JSON.stringify(user));
-
-      blogService.setToken(user.token);
-      userDispatch({ type: "setUser", payload: user });
-      setUsername("");
-      setPassword("");
-    } catch (exception) {
-      notify({ body: "Wrong credentials", error: true });
-    }
-  };
-
-  const handleLogout = () => {
-    window.localStorage.removeItem("loggedInUser");
-    userDispatch({ type: "clearUser" });
-  };
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          id="username"
-          onChange={({ target }) => setUsername(target.value)}
-        ></input>
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          id="password"
-          onChange={({ target }) => setPassword(target.value)}
-        ></input>
-      </div>
-      <button type="submit" id="login-button">
-        login
-      </button>
-    </form>
-  );
-
-  const blogsList = (user) => (
-    <div>
-      <h2>blogs</h2>
-      <p>
-        {user.name} logged in{" "}
-        <button id="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
-      </p>
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm />
-      </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} />
-      ))}
-    </div>
-  );
-
-  if (result.isLoading) {
-    return <div>loading data...</div>;
-  }
+  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
 
   return (
     <>
       <Notification />
-      {user === null && loginForm()}
-      {user !== null && blogsList(user)}
+      <Routes>
+        <Route path="/blogs/:id" element={<Blog blog={blog} user={user} />} />
+        <Route path="/blogs" element={<Blogs blogs={blogs} user={user} />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            user ? (
+              <Blogs blogs={blogs} user={user} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
   );
 };

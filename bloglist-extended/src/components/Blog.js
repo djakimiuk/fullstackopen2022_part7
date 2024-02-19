@@ -5,13 +5,13 @@ import { useNotify } from "../NotificationContext";
 
 const Blog = ({ blog, user }) => {
   const [visible, setVisible] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
+  const [likes, setLikes] = useState(blog?.likes);
 
   const queryClient = useQueryClient();
   const notify = useNotify();
   const showWhenVisible = { display: visible ? "" : "none" };
   const showDeleteBtn = {
-    display: blog.user.username === user.username ? "" : "none",
+    display: blog?.user.username === user?.username ? "" : "none",
   };
 
   const blogStyle = {
@@ -61,7 +61,7 @@ const Blog = ({ blog, user }) => {
   const increaseLikes = async () => {
     const updatedLikes = likes + 1;
     setLikes(updatedLikes);
-    const modifiedBlog = { ...blog, likes: updatedLikes};
+    const modifiedBlog = { ...blog, likes: updatedLikes };
     updateBlogMutation.mutateAsync(modifiedBlog);
   };
 
@@ -75,19 +75,19 @@ const Blog = ({ blog, user }) => {
   return (
     <div style={blogStyle} className="blog">
       <span className="titleAndAuthor">
-        {blog.title} {blog.author}
+        {blog?.title} {blog?.author}
       </span>
       <button onClick={visibilityHandler}>{visible ? "hide" : "view"}</button>
       <br></br>
       <div style={showWhenVisible}>
-        <a href={blog.url}>{blog.url}</a>
+        <a href={blog?.url}>{blog?.url}</a>
         <br></br>
         <span className="likes">{likes}</span>
         <button onClick={increaseLikes} id="like-button">
           like
         </button>
         <br></br>
-        <span className="blogUser">{blog.user.name}</span>
+        <span className="blogUser">{blog?.user.name}</span>
         <br></br>
         <button
           id="remove-button"
