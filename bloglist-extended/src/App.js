@@ -14,22 +14,43 @@ import Blog from "./components/Blog";
 import Login from "./components/Login";
 import NotFound from "./components/NotFound";
 import Users from "./components/Users";
+import User from "./components/User";
 import { useQuery } from "@tanstack/react-query";
 import blogService from "./services/blogs";
+import userService from "./services/users";
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
-  const result = useQuery({
+
+  const blogsResult = useQuery({
     queryKey: ["blogs"],
     queryFn: blogService.getAll,
     refetchOnWindowFocus: false,
   });
 
-  const match = useMatch("/blogs/:id");
+  const blogMatch = useMatch("/blogs/:id");
 
-  const blogs = result.data;
+  const blogs = blogsResult.data;
 
-  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
+  const blog =
+    blogMatch && blogs
+      ? blogs.find((blog) => blog.id === blogMatch.params.id)
+      : null;
+
+  const userMatch = useMatch("/users/:id");
+
+  const usersResult = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.getAll,
+    refetchOnWindowFocus: false,
+  });
+
+  const users = usersResult.data;
+
+  const chosenUser =
+    userMatch && users
+      ? users.find((user) => user.id === userMatch.params.id)
+      : null;
 
   const userDispatch = useUserDispatch();
 
@@ -68,7 +89,8 @@ const App = () => {
             )
           }
         />
-        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User user={chosenUser} />} />
+        <Route path="/users" element={<Users users={users} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
