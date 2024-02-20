@@ -13,6 +13,7 @@ import Blogs from "./components/Blogs";
 import Blog from "./components/Blog";
 import Login from "./components/Login";
 import NotFound from "./components/NotFound";
+import Users from "./components/Users";
 import { useQuery } from "@tanstack/react-query";
 import blogService from "./services/blogs";
 
@@ -30,9 +31,29 @@ const App = () => {
 
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
 
+  const userDispatch = useUserDispatch();
+
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedInUser");
+    userDispatch({ type: "clearUser" });
+  };
+
   return (
     <>
       <Notification />
+      {user ? (
+        <>
+          <h2>blogs</h2>
+          <div>
+            {user.name} logged in{" "}
+            <p>
+              <button id="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </p>
+          </div>
+        </>
+      ) : null}
       <Routes>
         <Route path="/blogs/:id" element={<Blog blog={blog} user={user} />} />
         <Route path="/blogs" element={<Blogs blogs={blogs} user={user} />} />
@@ -47,6 +68,7 @@ const App = () => {
             )
           }
         />
+        <Route path="/users" element={<Users />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
