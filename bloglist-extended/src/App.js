@@ -1,16 +1,14 @@
 import Notification from "./components/Notification";
-import { useNotify } from "./NotificationContext";
-import { useUserDispatch, useUserValue } from "./UserContext";
+import { useUserDispatch } from "./UserContext";
 import {
   Routes,
   Route,
-  Link,
   Navigate,
-  useNavigate,
   useMatch,
+  useNavigate,
 } from "react-router-dom";
 import Blogs from "./components/Blogs";
-import Blog from "./components/Blog";
+import BlogView from "./components/BlogView";
 import Login from "./components/Login";
 import NotFound from "./components/NotFound";
 import Users from "./components/Users";
@@ -21,6 +19,7 @@ import userService from "./services/users";
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  const navigate = useNavigate();
 
   const blogsResult = useQuery({
     queryKey: ["blogs"],
@@ -57,6 +56,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedInUser");
     userDispatch({ type: "clearUser" });
+    navigate("/");
   };
 
   return (
@@ -76,11 +76,18 @@ const App = () => {
         </>
       ) : null}
       <Routes>
-        <Route path="/blogs/:id" element={<Blog blog={blog} user={user} />} />
-        <Route path="/blogs" element={<Blogs blogs={blogs} user={user} />} />
-        <Route path="/login" element={<Login />} />
         <Route
-          path="/"
+          path="/blogs/:id"
+          element={
+            user ? (
+              <BlogView blog={blog} user={user} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/blogs"
           element={
             user ? (
               <Blogs blogs={blogs} user={user} />
@@ -89,8 +96,25 @@ const App = () => {
             )
           }
         />
-        <Route path="/users/:id" element={<User user={chosenUser} />} />
-        <Route path="/users" element={<Users users={users} />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            user ? <Blogs blogs={blogs} /> : <Navigate replace to="/login" />
+          }
+        />
+        <Route
+          path="/users/:id"
+          element={
+            user ? <User user={chosenUser} /> : <Navigate replace to="/login" />
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            user ? <Users users={users} /> : <Navigate replace to="/login" />
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

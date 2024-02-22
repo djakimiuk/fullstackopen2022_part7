@@ -3,7 +3,7 @@ import Blog from "./Blog";
 import Togglable from "./Togglable";
 import BlogForm from "./BlogForm";
 
-const Blogs = ({ user, blogs }) => {
+const Blogs = ({ blogs }) => {
   const blogFormRef = useRef();
 
   if (!blogs) {
@@ -16,7 +16,7 @@ const Blogs = ({ user, blogs }) => {
         <BlogForm />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} />
+        <Blog key={blog.id} blog={blog} />
       ))}
     </div>
   );
