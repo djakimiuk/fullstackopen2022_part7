@@ -1,3 +1,4 @@
+import { Container, AppBar, Toolbar, Typography, Button } from "@mui/material";
 import Notification from "./components/Notification";
 import { useUserDispatch } from "./UserContext";
 import {
@@ -6,6 +7,7 @@ import {
   Navigate,
   useMatch,
   useNavigate,
+  Link,
 } from "react-router-dom";
 import Blogs from "./components/Blogs";
 import BlogView from "./components/BlogView";
@@ -59,22 +61,48 @@ const App = () => {
     navigate("/");
   };
 
+  const padding = { padding: 5 };
+
   return (
-    <>
-      <Notification />
-      {user ? (
-        <>
-          <h2>blogs</h2>
-          <div>
-            {user.name} logged in{" "}
-            <p>
-              <button id="logout-button" onClick={handleLogout}>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography component="div" sx={{ flexGrow: 1 }}>
+            {user && (
+              <div>
+                <Link
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                    marginRight: "10px",
+                  }}
+                  to="/blogs"
+                >
+                  Blogs
+                </Link>
+                <Link
+                  style={{ color: "inherit", textDecoration: "none" }}
+                  to="/users"
+                >
+                  Users
+                </Link>
+              </div>
+            )}
+          </Typography>
+          <Typography >
+          {user ? `${user?.name} logged in` : null}
+          </Typography>
+          {user ? (
+            <div>
+              <Button color="error" onClick={handleLogout}>
                 Logout
-              </button>
-            </p>
-          </div>
-        </>
-      ) : null}
+              </Button>
+            </div>
+          ) : null}
+        </Toolbar>
+      </AppBar>
+      <Notification />
+      {user ? <h2>Blog App</h2> : null}
       <Routes>
         <Route
           path="/blogs/:id"
@@ -96,7 +124,10 @@ const App = () => {
             )
           }
         />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate replace to="/" />}
+        />
         <Route
           path="/"
           element={
@@ -117,7 +148,7 @@ const App = () => {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </Container>
   );
 };
 
