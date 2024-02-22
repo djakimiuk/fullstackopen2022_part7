@@ -2,6 +2,15 @@ import { useRef } from "react";
 import Blog from "./Blog";
 import Togglable from "./Togglable";
 import BlogForm from "./BlogForm";
+import {
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+} from "@mui/material";
 
 const Blogs = ({ blogs }) => {
   const blogFormRef = useRef();
@@ -15,9 +24,14 @@ const Blogs = ({ blogs }) => {
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+
+        <Table>
+          <TableBody>
+            {blogs.map((blog) => (
+              <Blog blog={blog} key={blog.id} />
+            ))}
+          </TableBody>
+        </Table>
     </div>
   );
 };

@@ -61,8 +61,6 @@ const App = () => {
     navigate("/");
   };
 
-  const padding = { padding: 5 };
-
   return (
     <Container>
       <AppBar position="static">
@@ -89,9 +87,14 @@ const App = () => {
               </div>
             )}
           </Typography>
-          <Typography >
-          {user ? `${user?.name} logged in` : null}
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{ flexGrow: 1, textDecoration: "underline" }}
+          >
+            Blog App
           </Typography>
+          <Typography>{user ? `${user?.name} logged in` : null}</Typography>
           {user ? (
             <div>
               <Button color="error" onClick={handleLogout}>
@@ -102,7 +105,7 @@ const App = () => {
         </Toolbar>
       </AppBar>
       <Notification />
-      {user ? <h2>Blog App</h2> : null}
+
       <Routes>
         <Route
           path="/blogs/:id"
