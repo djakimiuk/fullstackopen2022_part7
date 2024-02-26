@@ -5,9 +5,9 @@ const Blog = ({ blog }) => {
   return (
     <TableRow>
       <TableCell>
-        <Link to={`/blogs/${blog.id}`}>{blog?.url}</Link>
+        <Link to={`/blogs/${blog?.id}`}>{blog?.title}</Link>
       </TableCell>
-      <TableCell>{blog.user.name}</TableCell>
+      <TableCell>{blog.author}</TableCell>
     </TableRow>
   );
 };
