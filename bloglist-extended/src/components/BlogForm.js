@@ -1,7 +1,20 @@
 import { useState } from "react";
 import blogs from "../services/blogs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {useNotify } from "../NotificationContext";
+import { useNotify } from "../NotificationContext";
+import { TextField, Button, Paper, Typography } from "@mui/material";
+import { styled } from "@mui/system";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  maxWidth: 400,
+  width: "100%",
+  margin: "auto",
+  marginTop: theme.spacing(3),
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+}));
 
 const BlogForm = () => {
   const queryClient = useQueryClient();
@@ -42,44 +55,55 @@ const BlogForm = () => {
   };
 
   return (
-    <div>
-      <h2>create new</h2>
+    <StyledPaper elevation={3}>
+      <Typography variant="h5" gutterBottom></Typography>
       <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={(event) => setTitle(event.target.value)}
-            id="title-input"
-          ></input>
-        </div>
-        <div>
-          author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            id="author-input"
-            onChange={(event) => setAuthor(event.target.value)}
-          ></input>
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={url}
-            name="url"
-            id="url-input"
-            onChange={(event) => setUrl(event.target.value)}
-          ></input>
-        </div>
-        <button type="submit" id="addBlog-button">
+        <TextField
+          label="Title"
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          type="text"
+          value={title}
+          name="Title"
+          id="title-input"
+          onChange={(event) => setTitle(event.target.value)}
+        ></TextField>
+
+        <TextField
+          label="Author"
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          type="text"
+          value={author}
+          name="Author"
+          id="author-input"
+          onChange={(event) => setAuthor(event.target.value)}
+        ></TextField>
+
+        <TextField
+          label="Url"
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          type="text"
+          value={url}
+          name="url"
+          id="url-input"
+          onChange={(event) => setUrl(event.target.value)}
+        ></TextField>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          id="addBlog-button"
+        >
           create
-        </button>
+        </Button>
       </form>
-    </div>
+    </StyledPaper>
   );
 };
 
