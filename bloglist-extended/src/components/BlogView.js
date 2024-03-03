@@ -3,6 +3,7 @@ import blogs from "../services/blogs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNotify } from "../NotificationContext";
 import { useNavigate } from "react-router-dom";
+import Comments from "./Comments";
 
 const BlogView = ({ blog, user }) => {
   const [likes, setLikes] = useState(blog?.likes);
@@ -56,7 +57,7 @@ const BlogView = ({ blog, user }) => {
   const deleteHandler = () => {
     if (window.confirm(`Remove blog ${blog.title} ${blog.author}`)) {
       deleteBlogMutation.mutate(blog);
-      navigate('/')
+      navigate("/");
     }
     return;
   };
@@ -80,6 +81,7 @@ const BlogView = ({ blog, user }) => {
       <button id="remove-button" style={showDeleteBtn} onClick={deleteHandler}>
         remove
       </button>
+      <Comments blog={blog} />
     </>
   );
 };
