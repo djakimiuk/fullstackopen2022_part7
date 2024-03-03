@@ -1,6 +1,7 @@
 import { TextField, Button } from "@mui/material";
 import blogService from "../services/blogs";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const Comments = ({ blog }) => {
   const [comment, setComment] = useState("");
@@ -26,10 +27,12 @@ const Comments = ({ blog }) => {
   const handleAddComment = async (event) => {
     event.preventDefault();
     const newComment = {
+      id: uuidv4(),
       comment: comment,
     };
     await blogService.comment(newComment, blog.id);
     setComments([...comments, newComment]);
+    console.log(comments);
     setComment("");
   };
   return (

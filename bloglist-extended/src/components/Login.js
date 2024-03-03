@@ -23,13 +23,22 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedInUser");
-    if (loggedUserJSON) {
-      const parsedUser = JSON.parse(loggedUserJSON);
-      userDispatch({ type: "setUser", payload: parsedUser });
-      blogService.setToken(parsedUser.token);
-    }
-  }, []);
+    const initializeUser = async () => {
+      try {
+        console.log("inside initializer");
+        const loggedUserJSON = window.localStorage.getItem("loggedInUser");
+        if (loggedUserJSON) {
+          const parsedUser = JSON.parse(loggedUserJSON);
+          userDispatch({ type: "setUser", payload: parsedUser });
+          console.log("before set token");
+          await blogService.setToken(parsedUser.token);
+        }
+      } catch (error) {
+        console.error("Error initializing user:", error);
+      }
+    };
+    initializeUser();
+  }, [userDispatch]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -51,8 +60,7 @@ const Login = () => {
 
   return (
     <StyledPaper elevation={3}>
-      <Typography variant="h5" gutterBottom>
-      </Typography>
+      <Typography variant="h5" gutterBottom></Typography>
       <form onSubmit={handleLogin}>
         <TextField
           label="Username"

@@ -10,7 +10,7 @@ const Blogs = ({ blogs }) => {
   if (!blogs) {
     return <div>loading data...</div>;
   }
-
+  console.log(blogs);
   return (
     <div>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>

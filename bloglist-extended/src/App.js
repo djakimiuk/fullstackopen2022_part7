@@ -18,10 +18,17 @@ import User from "./components/User";
 import { useQuery } from "@tanstack/react-query";
 import blogService from "./services/blogs";
 import userService from "./services/users";
+import { useEffect } from "react";
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      blogService.setToken(user?.token);
+    }
+  });
 
   const blogsResult = useQuery({
     queryKey: ["blogs"],
